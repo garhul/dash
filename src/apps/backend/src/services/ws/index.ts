@@ -1,7 +1,7 @@
 import Websocket from 'ws';
-import config from '../../../config';
+import { getConfig } from '../../config';
 import { getTaggedLogger } from '../logger';
-const logger = getTaggedLogger('WS_SVC');
+const logger = getTaggedLogger('SERVICES::Websockets');
 
 export interface WsPayload {
   ev: string,
@@ -33,14 +33,15 @@ export async function send(client: Websocket.WebSocket | null = null, payload: W
 }
 
 export function init() {
-  WSServer = new Websocket.Server({ port: parseInt(config.server.wsPort as string) });
-  logger.info(`Websocket server started on port ${config.server.wsPort}`);
+  WSServer = new Websocket.Server({ port: getConfig('server.ws') as number });
+  logger.info(`Websocket server started on port ${getConfig('server.ws')}`);
 
   WSServer.on('connection', (socket, req) => {
     logger.info(`New WS connection incoming from ${req.headers['x-forwarded-for']}`);
 
     socket.on('message', (message) => {
       const { ev, msg, replyTo } = JSON.parse(message.toString());
+
       logger.debug(`Data from ws ${ev}`);
       // const hndlr = handlers.find((h) => h.ev === ev);
 

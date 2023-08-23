@@ -1,5 +1,5 @@
-import mqtt, { MqttClient } from 'mqtt';
-import config from '../../../config';
+import * as mqtt from 'mqtt';
+import { getConfig } from '../../config';
 import { getTaggedLogger } from '../logger';
 const logger = getTaggedLogger('MQTT');
 
@@ -8,16 +8,16 @@ export interface MQTTHandler {
   fn: (topic: string, payload: string) => void;
 }
 
-let client: MqttClient | null = null;
+let client: mqtt.MqttClient | null = null;
 
-function init(handlers: MQTTHandler[]): MqttClient {
-  const mqttClient = mqtt.connect(config.mqtt.broker);
+function init(handlers: MQTTHandler[]): mqtt.MqttClient {
+  const mqttClient = mqtt.connect(getConfig('mqtt.broker') as string);
 
   mqttClient.on('connect', () => {
-    logger.info(`Connected to mosquitto broker on ${config.mqtt.broker}`);
+    logger.info(`Connected to mosquitto broker on ${getConfig('mqtt.broker') as string}`);
 
     handlers.forEach(h => {
-      mqttClient.subscribe(h.topic, (err: any) => {
+      mqttClient.subscribe(h.topic, (err: unknown) => {
         if (err) {
           logger.error(err);
           throw err;
@@ -57,13 +57,13 @@ function init(handlers: MQTTHandler[]): MqttClient {
   // });
 }
 
-export function getClient(handlers: MQTTHandler[] | null = null): MqttClient {
-  if (client !== null)
+export function getClient(handlers: MQTTHandler[] = []): mqtt.MqttClient {
+  if (client !== null && client.connected)
     return client;
 
   if (handlers === null) {
     logger.warn('MQTT client initialized without topics subscription');
   }
 
-  return client = init(handlers || []);
+  return client = init(handlers);
 }

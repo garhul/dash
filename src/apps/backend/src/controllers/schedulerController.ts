@@ -1,27 +1,26 @@
-import { SchedulerRules } from '../services/db';
-import { RuleData } from '../types';
+
+
+import { Request, Response } from 'express';
+import { SchedulerProvider } from '../providers';
 import { getTaggedLogger } from '../services/logger';
-import { getClient as getMQTTClient } from '../services/mqtt'
-const logger = getTaggedLogger('SchedulerCTRL');
+import HttpStatusCodes from '../utils/httpStatusCodes';
+const logger = getTaggedLogger('CONTROLLERS::Scheduler');
 
-export function getAll() {
-  return SchedulerRules.getAll().map(([, val]) => val);
-}
+//TODO: implement crud actions, and scheduler
 
-// export async function add(id: string) {
-
+// export async function update(id: string, data: any) {
 // }
 
-export async function update(id: string, data: any) {
-}
+// function triggerAction(rule: ruleData) {
+//   const client = getMQTTClient();
 
 
-function triggerAction(rule: RuleData) {
-  const client = getMQTTClient();
+//   // deviceIds.map(id => Devices.get(id).topic).forEach(topic => {
+//   //   logger.info(`Emitting ${payload} to ${topic}`);
+//   //   getMQTTClient().publish(topic, payload);
+//   // });
+// }
 
-
-  // deviceIds.map(id => Devices.get(id).topic).forEach(topic => {
-  //   logger.info(`Emitting ${payload} to ${topic}`);
-  //   getMQTTClient().publish(topic, payload);
-  // });
+export function getAll(req: Request, res: Response) {
+  res.status(HttpStatusCodes.OK).json(SchedulerProvider.getAll());
 }

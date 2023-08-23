@@ -1,26 +1,19 @@
 import express from 'express';
-import { logger, httpLogger } from './services/logger';
-
-import getConfig from './config';
 import cors from 'cors';
-import router from './router';
-
+import { logger, httpLogger } from './services/logger';
+import { getConfig } from './config';
 import { closeConnections } from './evDispatcher';
+import router from './routes/';
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(httpLogger);
 
-const errHandler = (
-  err: Error,
-  _req: express.Request,
-  res: express.Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _next: express.NextFunction
-) => {
+const errHandler = (err: Error, _req: express.Request, res: express.Response) => {
   logger.error(err.stack);
   res.status(500).send('Something broke!');
 };
@@ -28,7 +21,7 @@ const errHandler = (
 app.use(router);
 
 const server = app.listen(getConfig('server.port'), () => {
-  logger.info(`Listening at http://localhost:${cfg.server.port}/api`);
+  logger.info(`Listening at http://localhost:${getConfig('server.port')}/api`);
 });
 
 app.use(errHandler);

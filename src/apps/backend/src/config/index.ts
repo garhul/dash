@@ -7,17 +7,17 @@ const configDefaults = new Map<string, Option>([
   // server 
   ['server.port', parseInt(process.env.DASH_SV_PORT) || 1984],
   ['server.ws', parseInt(process.env.DASH_WS_PORT) || 3030],
-  ['server.clientFolder', process.env.DASH_CLIENT_FOLDER || './public'],
+  ['server.client_folder', process.env.DASH_CLIENT_FOLDER || './public'],
 
   // logger
   ['logger.level', process.env.DASH_LOG_LEVEL || 'debug'],
-  ['logger.dest', process.env.DASH_LOG_PATH || 2], //defaults to stderr
+  ['logger.destination', process.env.DASH_LOG_PATH || 1], //defaults to stdout
 
   // storage
   ['store.groups', process.env.DASH_GROUPS_FILE || './data/controlGroups.json'],
   ['store.devices', process.env.DASH_DEVICES_FILE || './data/devices.json'],
   ['store.sensors', process.env.DASH_SENSORS_FILE || './data/sensors.json'],
-  ['store.scheduler_rules', process.env.DASH_SCHEDULER_FILE || './data/scheduler.json'],
+  ['store.scheduler', process.env.DASH_SCHEDULER_FILE || './data/scheduler.json'],
 
   // MQTT
   ['mqtt.broker', process.env.DASH_MQTT_BROKER || 'mqtt://10.10.1.37',],
@@ -41,8 +41,8 @@ const configDefaults = new Map<string, Option>([
 
   // misc
   ['scan_on_start', process.env.DASH_SCAN_ON_START || true], // scan for devices at startup
-  ['mock_devices', process.env.DASH_MOCK_DEVICES || true],
-  ['mock_sensors', process.env.DASH_MOCK_SENSORS || true],
+  ['mock_devices', parseInt(process.env.DASH_MOCK_DEVICES) || 3], // use 3 mocked devices for dev
+  ['mock_sensors', parseInt(process.env.DASH_MOCK_SENSORS) || 2],
   ['base_scan_addr', process.env.DASH_BASE_SCAN_ADDR || '10.10.1.'],
   ['scan_batch_size', parseInt(process.env.DASH_SCAN_BATCH_SIZE) || 24],
   ['scan_timeout', parseInt(process.env.DASH_SCAN_TOUT) || 5000],
@@ -50,7 +50,7 @@ const configDefaults = new Map<string, Option>([
 ]);
 
 
-export default function getConfig(key: string): Option {
+export function getConfig(key: string): Option {
   //throw if key doesn't exist.
   const normalized_key = key.toLowerCase();
   if (!configDefaults.has(normalized_key)) throw new Error(`Invalid config key requested [${key}]`);

@@ -1,11 +1,12 @@
 import PinoHttp from 'pino-http';
 import Pino from 'pino';
-import cfg from '../../../config';
+import { getConfig } from '../../config';
 
-export const logger = Pino({}, Pino.destination(cfg.logger.destination));
-logger.level = cfg.logger.level;
+export const logger = Pino({}, Pino.destination(getConfig('logger.destination') as string));
+logger.level = getConfig('logger.level') as string;
 
 export const getTaggedLogger = (tag: string) => logger.child({ tag });
+
 export const httpLogger = PinoHttp({
   wrapSerializers: true,
 
@@ -17,12 +18,12 @@ export const httpLogger = PinoHttp({
   },
 
   // Define a custom receive message
-  customReceivedMessage: function (req, res) {
+  customReceivedMessage: function (req, _res) {
     return `request received: ${req.method} ${req.url}`;
   },
 
   // Define a custom error message
-  customErrorMessage: function (req, res, err) {
+  customErrorMessage: function (_req, res) {
     return 'request errored with status code: ' + res.statusCode
   },
 

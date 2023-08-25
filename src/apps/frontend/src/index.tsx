@@ -1,5 +1,5 @@
 import React from 'react';
-import { MainView } from './pages/mainView';
+import { MainView } from './mainView';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 

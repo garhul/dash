@@ -1,4 +1,4 @@
-import { timeSeriesSubsetKey, timeSeriesSubset } from '../../types/types';
+import { timeSeriesSubsetKey, timeSeriesSubset } from '@dash/sharedTypes';
 
 const DAY = 24 * 3600;  //seconds in a day
 const WEEK = DAY * 7;

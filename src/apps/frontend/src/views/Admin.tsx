@@ -1,13 +1,14 @@
 // import React, { useState } from 'react';
 import { Container } from 'react-bootstrap';
-import Devices from './widgets/adminDevicesWidget';
-import Rules from './widgets/rulesWidget';
+// import Devices from './widgets/adminDevicesWidget';
+// import Rules from './widgets/rulesWidget';
 
-function SysInfo(props: any) {
+function SysInfo() {
   return (
     <Container className="widget">
-      SysInfo Be here (Hostname) load, temp, uptime, mqtt messages received, etc);
-    </Container>);
+      SysInfo Be here (Hostname) load, temp, uptime, mqtt traffic stats, etc);
+    </Container>
+  );
 }
 
 function Groups() {
@@ -15,16 +16,12 @@ function Groups() {
 }
 
 export default function AdminView() {
-
   return (
     <div className="AdminWidget">
       <SysInfo />
-      <Devices />
+      {/* <Devices />
       <Groups />
-      <Rules />
+      <Rules /> */}
     </div >
   );
 }
-
-
-

@@ -1,16 +1,34 @@
-export type deviceData = {
-  device_id: string;
-  strip_size: number;
-  topic: string;
+
+/*
+    { "ssid":"Vergafone",
+      "ap_ssid":"desk",
+      "human_name":"Desk",
+      "announce_topic":"announce",
+      "device_id":"Aurora_4a3f53",
+      "broker":"10.10.1.46",
+      "topic":"desk",
+      "build":"v0.1.189 - 2022-12-08 02:04:55.060429",
+      "use_mqtt":true,
+      "strip_size":80,
+      "ip":"10.10.1.11"
+*/
+export type deviceInfoPayload = {
+  ssid: string;
+  ap_ssid: string;
   human_name: string;
-  ip: string;
+  announce_topic: string;
+  device_id: string;
+  broker: string;
+  topic: string;
   build: string;
+  use_mqtt: boolean;
+  strip_size: number;
+  ip: string;
+}
+
+export type deviceData = deviceInfoPayload & {
+  id: string;
   state: deviceStateData;
-  announce_topic?: string;
-  ap_ssid?: string;
-  broker?: string;
-  use_mqtt?: boolean;
-  ssid?: string;
   stateString?: string;
   infoString?: string;
 };
@@ -22,6 +40,7 @@ export enum deviceMode {
 };
 
 /*
+From aurora firmware
 will
   doc["ev"] = "death";
   doc["id"] = getDeviceId();

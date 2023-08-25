@@ -1,5 +1,4 @@
-import create, { StateCreator } from 'zustand'
-import { unstable_batchedUpdates } from 'react-dom';
+import { create, StateCreator } from 'zustand'
 import { groupData, deviceData, sensorData, RuleData } from '@backend/types';
 import WS from './ws';
 const apiURL = `http://${window.location.host}/api/`;
@@ -65,10 +64,10 @@ const createSysSlice: StateCreator<SysSlice, [], [], SysSlice> = (set) => ({
   setWsConnected: (conn) => {
     set(state => ({ ...state, ...{ wsConnected: conn } }))
   },
-  setScanInProgress: (flag) => set(state => state.scanInProgress)
+  // setScanInProgress: (flag) => set(state => state.scanInProgress)
 });
 
-const updateRemote = async (entity: 'devices' | 'groups' | 'scheduler', payload) => {
+const updateRemote = async (entity: 'devices' | 'groups' | 'scheduler', payload: unknown) => {
   fetch(`${apiURL}${entity}`, {
     method: 'POST', // or 'PUT'
     headers: {
@@ -118,27 +117,27 @@ async function initStore() {
   const ws = new WS();
 
   ws.on('open', (data: deviceData[]) => {
-    unstable_batchedUpdates(() => {
-      useStore.getState().setWsConnected(true)
-    })
+
+    useStore.getState().setWsConnected(true)
+
   });
 
   ws.on('close', (data: deviceData[]) => {
-    unstable_batchedUpdates(() => {
-      useStore.getState().setWsConnected(false)
-    })
+
+    useStore.getState().setWsConnected(false)
+
   });
 
   ws.on('DEVICES_UPDATE', (data: deviceData[]) => {
-    unstable_batchedUpdates(() => {
-      useStore.getState().updateDevices(data)
-    })
+
+    useStore.getState().updateDevices(data)
+
   });
 
   ws.on('SENSORS_UPDATE', (data: sensorData[]) => {
-    unstable_batchedUpdates(() => {
-      useStore.getState().updateSensors(data)
-    })
+
+    useStore.getState().updateSensors(data)
+
   });
 
   // init ws connection after setting the subscriptions to prevent missing the 'open' message

@@ -1,5 +1,5 @@
 import { Groups } from '../services/store';
-import { groupData } from '../types/types';
+import { groupData } from '@dash/sharedTypes';
 
 export function del(id: string): boolean {
   return Groups.del(id);

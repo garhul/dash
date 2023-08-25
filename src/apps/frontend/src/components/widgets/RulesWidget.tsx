@@ -1,17 +1,17 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Combo from './controls/Combo';
-import { RuleData } from '@backend/types';
+import { ruleData } from '@dash/sharedTypes';
 import { Button, Container, Row, Col, Modal } from 'react-bootstrap';
 import { AiFillPlusCircle } from 'react-icons/ai';
 import useStore from '../../store';
-import AdminWidget from '../widgets/adminWidget';
-import SimpleTable from './controls/SimpleTable';
+import AdminWidget from './adminWidget';
+import SimpleTable from './SimpleTable';
 
 
 type RuelAddModalProps = {
   onClose: () => void;
-  onAdd: (data: RuleData) => void;
+  onAdd: (data: ruleData) => void;
   show: boolean;
 }
 

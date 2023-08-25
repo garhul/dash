@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Row } from "react-bootstrap";
 import { AiOutlineLink, AiOutlineReload } from "react-icons/ai";
-import useStore from '../../store/';
+import useStore from '../../store';
 import AdminWidget from "./adminWidget";
-import SimpleTable from './controls/SimpleTable';
+import SimpleTable from './SimpleTable';
 
 export default function DevicesWidget() {
   const [scanning, setScanning] = useState(false);

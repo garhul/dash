@@ -1,7 +1,6 @@
 import { Container } from 'react-bootstrap';
 import useStore from '../store';
-import { SensorCtrl } from '../components/widgets/controls/controlDefinitions';
-import { Widget } from '../components/widgets';
+import Widget from '../components/widgets';
 
 export default function SensorsView() {
   const sensors = useStore((store) => store.sensors);

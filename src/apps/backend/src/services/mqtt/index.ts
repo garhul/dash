@@ -22,7 +22,7 @@ function init(handlers: MQTTHandler[]): mqtt.MqttClient {
           logger.error(err);
           throw err;
         }
-        logger.info(`Subscribbed to topic ${h.topic}`);
+        logger.info(`Subscribed to topic ${h.topic}`);
       });
     });
 

@@ -1,6 +1,5 @@
 {
-  "compilerOptions": {
-    "paths": { "@backend/types": ["../backend/src/types/types.tsx"], },
+  "compilerOptions": {    
     "jsx": "react-jsx",
     "allowJs": false,
     "esModuleInterop": false,

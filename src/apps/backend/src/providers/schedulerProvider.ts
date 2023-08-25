@@ -1,5 +1,5 @@
 import { SchedulerRules } from "../services/store";
-import { ruleData } from "../types/types";
+import { ruleData } from "@dash/sharedTypes";
 
 export function del(id: string) {
   return SchedulerRules.del(id);

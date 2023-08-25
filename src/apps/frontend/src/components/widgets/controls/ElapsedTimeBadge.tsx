@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Row, Badge } from "react-bootstrap";
 
-function timeSince(t:number) {    
+function timeSince(t: number) {
   const min = 60;
   const hour = 3600;
   const day = 86400;
@@ -27,18 +27,18 @@ function timeSince(t:number) {
   return `${Math.floor(t / week)}w`;
 }
 
-export type ElapsedTimeBadgePropsType = {lastSeen:number}
+export type ElapsedTimeBadgePropsType = { lastSeen: number }
 
 export default function ElapsedTimeBadge(props: ElapsedTimeBadgePropsType) {
-  const [ ,updateElapsed] = useState(0);
+  const [, updateElapsed] = useState(0);
   const elapsedSeconds = Math.ceil((Date.now() - props.lastSeen) / 1000);
 
-  useEffect(()=> {
+  useEffect(() => {
     const interval = setInterval(() => updateElapsed(Date.now()), 10000);
     return () => {
       clearInterval(interval);
     };
-  },[]);    
+  }, []);
   return (
     <Row className="elapsed_time">
       <Badge bg={(elapsedSeconds < 3600) ? 'dark' : 'danger'}>{`${timeSince(elapsedSeconds)} ago`}</Badge>

@@ -1,4 +1,4 @@
-import { deviceData, groupData, ruleData, sensorData, timeSeriesDataPoint, timeSeriesSubset } from '../../types/types';
+import { deviceData, groupData, ruleData, sensorData } from '@dash/sharedTypes';
 import { getTaggedLogger } from '../logger';
 import { getConfig } from '../../config';
 import fs from 'fs';
@@ -27,7 +27,7 @@ function persistToFile<T>(data: Array<[id: string, value: T]>, filePath: string)
 }
 
 export const Devices = new ObservableCollection<deviceData>('Devices', loadFromFile<deviceData>(getConfig('store.devices') as string));
-Devices.onChange((d) => persistToFile<deviceData>(d, getConfig('store.devices') as string));
+// Devices.onChange((d) => persistToFile<deviceData>(d, getConfig('store.devices') as string));
 
 export const Groups = new ObservableCollection<groupData>('Groups', loadFromFile<groupData>(getConfig('store.groups') as string));
 Groups.onChange((d) => persistToFile<groupData>(d, getConfig('store.groups') as string));

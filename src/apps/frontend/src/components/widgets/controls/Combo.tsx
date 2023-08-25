@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, ChangeEventHandler } from "react";
 import { Col, Row } from 'react-bootstrap';
 
 export type ComboProperties = {
@@ -14,7 +14,7 @@ export default function Combo({ onChange, value = '', disabled = false, showOthe
   const [selectedOption, setSelectedOption] = useState(value);
   const [controlValue, setControlValue] = useState(value);
 
-  const handleSelectionChange: React.ChangeEventHandler<HTMLSelectElement> = (ev): void => {
+  const handleSelectionChange: ChangeEventHandler<HTMLSelectElement> = (ev): void => {
     ev.preventDefault();
     const val = ev.currentTarget.value;
     setSelectedOption(val);
@@ -26,7 +26,7 @@ export default function Combo({ onChange, value = '', disabled = false, showOthe
 
   };
 
-  const handleTextChange: React.ChangeEventHandler<HTMLInputElement> = (ev): void => {
+  const handleTextChange: ChangeEventHandler<HTMLInputElement> = (ev): void => {
     ev.preventDefault();
     const val = ev.currentTarget.value;
     onChange(val);

@@ -1,11 +1,13 @@
-import { timeSeriesSubset, timeSeriesSubsetKey } from "@backend/types";
+import { timeSeriesSubset, timeSeriesSubsetKey } from "@dash/sharedTypes";
 import { useState } from "react";
 import { Row, Col, Badge, Container, ButtonGroup, Button } from "react-bootstrap";
 import { FiArrowUp, FiArrowDown } from "react-icons/fi";
 import { WiThermometer, WiHumidity, WiBarometer, WiLightning, WiAlien } from "react-icons/wi";
 import ElapsedTimeBadge from "./ElapsedTimeBadge";
+import LabelControl from "./LabelControl";
 import Plot from "./Plot";
-export type SensorPropType = {
+
+export type sensorProps = {
   channels: [
     { icon: string, key: string, color: string, unit: string }
   ];
@@ -13,17 +15,17 @@ export type SensorPropType = {
   lastSeen: number;
 }
 
-export type SensorChannelPropType = {
-  channelSeries: timeSeriesSubset;
-  channelKey : string;
+export type sensorChannelProps = {
+  channelSeries: timeSeriesSubset | null;
+  channelKey: string;
   icon: string;
   unit: string;
   color: string;
 }
 
-type PlotButtonRowPropType = {
-  setDomain: (string) => void;
-  domain:timeSeriesSubsetKey;
+type plotButtonRowProps = {
+  onDomainChange: (domain: timeSeriesSubsetKey) => void;
+  domain: timeSeriesSubsetKey;
 }
 
 function getIcon(icon: string) {
@@ -45,71 +47,83 @@ function getIcon(icon: string) {
   }
 }
 
-function SensorChannel(props: SensorChannelPropType) {
-  const aggregatedData = props.channelSeries.extras;
-  const plotData = props.channelSeries.series.map(datapoint => ({t: datapoint[0] * 1000, v: datapoint[1] / 1000}));
-  
+function SensorChannel({ channelSeries, channelKey, icon, unit, color }: sensorChannelProps) {
+
+  if (channelSeries === null) {
+    return (
+      <Row className="sensor_row" key={`chann_${channelKey}`}>
+        <LabelControl>Channel data not available</LabelControl>
+      </Row>
+    );
+  }
+
+  const plotData = channelSeries.series.map(datapoint => ({ t: datapoint[0] * 1000, v: datapoint[1] / 1000 }));
+
   return (
-    <Row className="sensor_row" key={`chann_${props.channelKey}`}>     
-      <Row>        
+    <Row className="sensor_row" key={`chann_${channelKey}`}>
+      <Row>
         <Col xs="auto">
-          <h2>{getIcon(props.icon)} {(aggregatedData.last / 1000).toFixed(2)} <small>{props.unit}</small></h2>
+          <h2>{getIcon(icon)} {(channelSeries.extras.last !== null) ? (channelSeries.extras.last / 1000).toFixed(2) : 'NA'} <small>{unit}</small></h2>
         </Col>
-        <Col xs="auto">          
+        <Col xs="auto">
           <Row>
-            <Col><FiArrowUp style={{ "fontSize": "2vh" }}/></Col>
+            <Col><FiArrowUp style={{ "fontSize": "2vh" }} /></Col>
             <Col>
-              <Badge bg="dark" style={{ "fontSize": "1.5vh" }}>{(aggregatedData.max / 1000).toFixed(2)}</Badge>
+              <Badge bg="dark" style={{ "fontSize": "1.5vh" }}>
+                {(channelSeries.extras.max !== null) ? (channelSeries.extras.max / 1000).toFixed(2) : 'NA'}
+              </Badge>
             </Col>
           </Row>
           <Row>
             <Col><FiArrowDown style={{ "fontSize": "2vh" }} /></Col>
             <Col>
-              <Badge bg="dark" style={{ "fontSize": "1.5vh" }}>{(aggregatedData.min / 1000).toFixed(2)}</Badge>
+              <Badge bg="dark" style={{ "fontSize": "1.5vh" }}>
+                {(channelSeries.extras.min !== null) ? (channelSeries.extras.min / 1000).toFixed(2) : 'NA'}
+              </Badge>
             </Col>
-          </Row>         
+          </Row>
         </Col>
-      </Row>        
-      <Plot 
-        unit={props.unit}
-        color={props.color}
+      </Row>
+      <Plot
+        unit={unit}
+        color={color}
         data={plotData}
-        min={(aggregatedData.min / 1000)}
-        max={(aggregatedData.max / 1000)}
-        intervalWindow={props.channelSeries.timeWindow}
-      />                
+        min={(channelSeries.extras.min !== null) ? (channelSeries.extras.min / 1000) : 0}
+        max={(channelSeries.extras.max !== null) ? (channelSeries.extras.max / 1000) : 0}
+        intervalWindow={channelSeries.timeWindow}
+      />
     </Row>)
 }
 
-export function PlotButtonRow(props: PlotButtonRowPropType) {  
-  const setSubset = props.setDomain;
+function PlotButtonRow({ domain, onDomainChange }: plotButtonRowProps) {
   return (<Row className="plot-buttons">
-    <ButtonGroup aria-label="timescales">      
-      <Button variant={(props.domain === 'Year') ? 'outline-warning' : 'outline-secondary'} onClick={() => { setSubset('Year') }} >last Year</Button>
-      <Button variant={(props.domain === 'Month') ? 'outline-warning' : 'outline-secondary'} onClick={() => { setSubset('Month') }} >last 30d</Button>
-      <Button variant={(props.domain === 'Week') ? 'outline-warning' : 'outline-secondary'} onClick={() => { setSubset('Week') }} >last 7d</Button>
-      <Button variant={(props.domain === 'Day') ? 'outline-warning' : 'outline-secondary'} onClick={() => { setSubset('Day') }} >last 24h</Button>
-      <Button variant={(props.domain === 'Immediate') ? 'outline-warning' : 'outline-secondary'} onClick={() => { setSubset('Immediate') }} >instant</Button>
-    </ButtonGroup>    
+    <ButtonGroup aria-label="timescales">
+      <Button variant={(domain === 'Year') ? 'outline-warning' : 'outline-secondary'} onClick={() => { onDomainChange('Year') }} >last Year</Button>
+      <Button variant={(domain === 'Month') ? 'outline-warning' : 'outline-secondary'} onClick={() => { onDomainChange('Month') }} >last 30d</Button>
+      <Button variant={(domain === 'Week') ? 'outline-warning' : 'outline-secondary'} onClick={() => { onDomainChange('Week') }} >last 7d</Button>
+      <Button variant={(domain === 'Day') ? 'outline-warning' : 'outline-secondary'} onClick={() => { onDomainChange('Day') }} >last 24h</Button>
+      <Button variant={(domain === 'Immediate') ? 'outline-warning' : 'outline-secondary'} onClick={() => { onDomainChange('Immediate') }} >instant</Button>
+    </ButtonGroup>
   </Row>);
 }
 
-export default function Sensor(props: SensorPropType) {  
-  const [domain, setDomain] = useState<timeSeriesSubsetKey>('Immediate');  
-  
-  const channels = props.channels.map(chan => (<SensorChannel key={`sensor_${chan.key}`}
-    channelSeries = {props.data.find(subset => subset.key === chan.key).series.find(s => s.key === domain)}
-    icon={chan.icon}
-    channelKey={chan.key}
-    unit={chan.unit}
-    color={chan.color}
-    ></SensorChannel>))
+export default function Sensor({ lastSeen, channels, data }: sensorProps) {
+  const [domain, setDomain] = useState<timeSeriesSubsetKey>('Immediate');
+
+  const plotChannels = channels.map(channel => (
+    <SensorChannel key={`sensor_${channel.key}`}
+      channelSeries={data.find(subset => subset.key === channel.key)?.series.find(s => s.key === domain) || null}
+      icon={channel.icon}
+      channelKey={channel.key}
+      unit={channel.unit}
+      color={channel.color}
+    />));
 
   return (
     <Container>
-      {channels}
-      <PlotButtonRow setDomain={(dom) => setDomain(dom) } domain={domain}/>
-      <ElapsedTimeBadge lastSeen={props.lastSeen} />
+      {plotChannels}
+      <PlotButtonRow onDomainChange={setDomain} domain={domain} />
+      <ElapsedTimeBadge lastSeen={lastSeen} />
     </Container>
   )
 }

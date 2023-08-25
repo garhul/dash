@@ -49,7 +49,7 @@ export default class ObservableCollection<T> {
     const d = this.#data.get(key);
     if (d !== undefined) return d as T;
 
-    throw new Error(`key ${key} doesn't exist in collection ${this.name}`);
+    throw new Error(`key ${key} doesn't exist ${this.name} in collection `);
   }
 
   exists(key: string): boolean {

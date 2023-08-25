@@ -9,10 +9,10 @@ import scheduler from './scheduler';
 
 const router = Router();
 
-router.use('/api/devices', devices);
-router.use('/api/devices', groups);
-router.use('/api/devices', sensors);
-router.use('/api/devices', scheduler);
+router.use('/api', devices);
+router.use('/api', groups);
+router.use('/api', sensors);
+router.use('/api', scheduler);
 
 //add route for exposing required config to frontend
 router.get('/api/cfg', (req: Request, res: Response) => {

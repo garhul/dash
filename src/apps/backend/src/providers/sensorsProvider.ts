@@ -1,7 +1,7 @@
 import { getTaggedLogger } from "../services/logger";
 import { Sensors, processSensorData } from "../services/store";
 import TimeSeries from "../services/store/timeSeries";
-import { sensorData } from "../types/types";
+import { sensorData } from "@dash/sharedTypes";
 
 const logger = getTaggedLogger('PROVIDERS::Sensors');
 

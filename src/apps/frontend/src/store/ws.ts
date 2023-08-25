@@ -4,7 +4,8 @@ export type evHandler = (data: any) => void;
 
 export default class WS {
   socket: WebSocket;
-  subscriptions: Map<any, any>;
+  subscriptions: Map<string, any>;
+
   constructor() {
     this.subscriptions = new Map();
   }
@@ -32,7 +33,7 @@ export default class WS {
     })
   }
 
-  async emit(ev: string, msg, expectResponse = false) {
+  async emit(ev: string, msg: string, expectResponse = false) {
     return new Promise((resolve, reject) => {
       console.info(`Emitting message: ${JSON.stringify({ ev, msg })}`);
 

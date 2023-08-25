@@ -1,5 +1,4 @@
 import path from 'path';
-
 export type Option = number | string | boolean;
 
 const configDefaults = new Map<string, Option>([

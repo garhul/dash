@@ -10,9 +10,9 @@ export function add(req: Request, res: Response) {
   logger.warn('Add device function not implemented');
 }
 
-export function issueCommand(req: Request<unknown, unknown, { deviceIds: string[], payload: string }>, res: Response) {
+export function issueCommand(req: Request<unknown, unknown, { ids: string[], payload: string }>, res: Response) {
   try {
-    DevicesProvider.issueCommand(req.body.deviceIds, req.body.payload);
+    DevicesProvider.issueCommand(req.body.ids, req.body.payload);
     res.status(HttpStatusCodes.ACCEPTED).send();
   } catch (ex) {
     logger.error(`Error issuig command ${ex}`);

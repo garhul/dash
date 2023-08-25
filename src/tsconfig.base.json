@@ -1,6 +1,9 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "paths": { 
+      "@dash/sharedTypes": ["libs/sharedTypes/types.ts"] 
+    },
     "rootDir": ".",
     "sourceMap": true,
     "declaration": false,
@@ -13,8 +16,7 @@
     "lib": ["es2021", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": ".",
-    "paths": {}
+    "baseUrl": "."    
   },
   "exclude": ["node_modules", "tmp"]
 }

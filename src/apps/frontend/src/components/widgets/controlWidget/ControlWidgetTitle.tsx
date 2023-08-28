@@ -1,21 +1,21 @@
-import { deviceData } from "@dash/sharedTypes";
+import { device } from "@dash/sharedTypes";
 import { Col, Badge, Row } from "react-bootstrap";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { controlWidgetTypes } from "./ControlWidget";
+import { controlWidgetTypes } from "./types";
 
 type widgetTitleProps = {
   type: keyof typeof controlWidgetTypes;
   onViewToggle: () => void;
   name: string;
   ip?: string;
-  devices?: deviceData[];
+  devices?: device[];
 }
 
-export default function WidgetTitle({ name, onViewToggle, type, ip, devices }: widgetTitleProps) {
+export default function ControlWidgetTitle({ name, onViewToggle, type, ip, devices }: widgetTitleProps) {
 
   const badges = (type === 'GROUP' && devices) ?
     (<Col className="badges">
-      {devices.map((d: deviceData, index: number) => <Badge bg="secondary" key={`badge_${index}`} text="dark">{d.human_name}</Badge>)}
+      {devices.map((d: device, index: number) => <Badge bg="secondary" key={`badge_${index}`} text="dark">{d.human_name}</Badge>)}
     </Col>) : null;
 
   return (

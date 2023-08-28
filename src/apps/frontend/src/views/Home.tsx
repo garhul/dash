@@ -1,13 +1,15 @@
 
 import { Container } from 'react-bootstrap';
 import useStore from '../store';
-import ControlWidget from '../components/widgets/ControlWidget';
-import { expandedGroupData } from '@dash/sharedTypes';
+import ControlWidget from '../components/widgets/controlWidget/ControlWidget';
+
+import { groupDataWithDevices } from '@dash/sharedTypes';
+import { groupControlWidget } from '../components/widgets/controlWidget/types';
 
 export default function HomeView() {
   const store = useStore((store) => store);
 
-  const expandedGroups: expandedGroupData[] = store.groups.map(group => {
+  const expandedGroups: groupDataWithDevices[] = store.groups.map(group => {
     return {
       id: group.id,
       name: group.name,
@@ -18,7 +20,7 @@ export default function HomeView() {
 
   return (
     <Container>
-      {expandedGroups.map((groupData) => <ControlWidget data={groupData} type='GROUP' />)}
+      {expandedGroups.map((groupData) => <ControlWidget<groupControlWidget> data={groupData} type='GROUP' />)}
     </Container>
   );
 }

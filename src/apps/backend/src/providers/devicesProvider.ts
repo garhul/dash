@@ -3,7 +3,7 @@ import { Devices } from '../services/store';
 import { timedPromise } from '../utils';
 import { getTaggedLogger } from '../services/logger';
 import { getClient as getMQTTClient } from '../services/mqtt'
-import { announcementPayload, birthAnouncementPayload, deathAnouncementPayload, deviceData, deviceInfoPayload, stateChangeAnnouncementPayload } from '@dash/sharedTypes';
+import { announcementPayload, birthAnouncementPayload, deathAnouncementPayload, device, deviceInfoPayload, stateChangeAnnouncementPayload } from '@dash/sharedTypes';
 import { getConfig } from '../config';
 
 const logger = getTaggedLogger('PROVIDERS::Devices');
@@ -13,11 +13,11 @@ export function isScanning(): boolean {
   return _scanning;
 }
 
-function isDeviceInfoValid(info: deviceData): boolean {
+function isDeviceInfoValid(info: deviceInfoPayload): boolean {
   return (
     info.topic !== undefined
     && info.human_name !== undefined
-    && (info.id !== undefined || info.device_id !== undefined)
+    && info.device_id !== undefined
   );
 };
 
@@ -106,7 +106,7 @@ export async function scan() {
     const fn = async () => {
       try {
         const d = await queryDevice(ip);
-        return d as deviceData;
+        return d as device;
       } catch (ex) {
         logger.warn(ex);
         return null;
@@ -114,7 +114,7 @@ export async function scan() {
     };
 
     queries.push(
-      timedPromise<deviceData | null>(fn(), scanTimeout)
+      timedPromise<device | null>(fn(), scanTimeout)
         .catch(ex => { if (ex.message !== 'Timed out') logger.warn(ex.message) })
         .finally(() => spawnedFuncs--)
     );
@@ -133,27 +133,27 @@ export async function scan() {
   _scanning = false;
 }
 
-async function queryDevice(ipAddr: string): Promise<deviceData | null> {
+async function queryDevice(ipAddr: string): Promise<device | null> {
   try {
     const infoAddr = `http://${ipAddr}/info`;
     const stateAddr = `http://${ipAddr}/state`;
 
     const res = await fetch(infoAddr);
     const infoString = await res.text();
-    const infoPayload = JSON.parse(infoString);
+    const infoPayload = JSON.parse(infoString) as deviceInfoPayload;
 
     if (isDeviceInfoValid(infoPayload)) {
       const stateString = await (await fetch(stateAddr)).text();
-
       logger.info(`Found device at ip ${ipAddr}`);
 
       return {
         ...infoPayload,
+        name: infoPayload.human_name,
         state: JSON.parse(stateString),
         id: infoPayload.device_id,
         stateString,
         infoString
-      } as deviceData;
+      } as device;
 
     } else {
       logger.warn(`Found device at ip ${ipAddr} with invalid info json`);
@@ -172,7 +172,7 @@ async function queryDevice(ipAddr: string): Promise<deviceData | null> {
   return null;
 }
 
-function getMockDevice(): deviceData {
+function getMockDevice(): device {
   const br = 5 + Math.ceil(Math.random() * 80);
   const spd = 5 + Math.ceil(Math.random() * 80);
   const length = 5 + Math.ceil(Math.random() * 100);
@@ -185,6 +185,7 @@ function getMockDevice(): deviceData {
     announce_topic: getConfig('mqtt.announce_topic') as string,
     device_id: `mok_dev_${id}`,
     id: `mok_dev_${id}`,
+    name: `Mock device ${id}`,
     broker: '192.168.1.10',
     topic: `mock/topic${id}`,
     build: 'v0.1.42 - 2020-10-31 19:36:47.426951',
@@ -200,7 +201,7 @@ if (getConfig('scan_on_start')) scan();
 if ((getConfig('mock_devices') as number) > 0) {
   setTimeout(() => {
     logger.info(`Adding ${getConfig('mock_devices')} mock devices`);
-    const mockdevs: [string, deviceData][] = [];
+    const mockdevs: [string, device][] = [];
 
     for (let i = 0; i < (getConfig('mock_devices') as number); i++) {
       const d = getMockDevice();

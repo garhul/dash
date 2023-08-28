@@ -1,13 +1,14 @@
 import { create, StateCreator } from 'zustand'
-import { groupData, deviceData, sensor, ruleData } from '@dash/sharedTypes';
+import { groupData, device, sensor, ruleData } from '@dash/sharedTypes';
 import WS from './ws';
 import { commandPayload } from '../model/controlDefinitions';
-const apiURL = `http://${window.location.host}/api/`;
+const apiURL = `http://${window.location.hostname}:1984/api/`;
+console.log({ apiURL });
 
 interface DevicesSlice {
-  devices: deviceData[];
-  updateDevices(devices: deviceData[]): void;
-  issueCMD(deviceIds: string[], payload: commandPayload): void;
+  devices: device[];
+  updateDevices(devices: device[]): void;
+  issueCMD(ids: string[], payload: string, debounce?: boolean): void;
 };
 
 interface GroupsSlice {
@@ -39,7 +40,8 @@ type StateType = DevicesSlice & GroupsSlice & SensorsSlice & RulesSlice & SysSli
 const createDevicesSlice: StateCreator<StateType, [], [], DevicesSlice> = (set) => ({
   devices: [],
   updateDevices: (devices) => set((state) => ({ devices })),
-  issueCMD: (deviceIds, payload) => updateRemote('devices', JSON.stringify({ deviceIds, payload })),
+  // TODO: implement debouncing
+  issueCMD: (ids, payload, debounce = true) => updateRemote('devices', JSON.stringify({ ids, payload })),
 });
 
 const createGroupsSlice: StateCreator<StateType, [], [], GroupsSlice> = (set) => ({
@@ -108,7 +110,7 @@ const useStore = create<StateType>()((...a) => ({
 
 async function initStore() {
   useStore.setState({
-    devices: await getRemote<deviceData[]>('devices'),
+    devices: (await getRemote<[string, device][]>('devices')).map(d => d[1]),
     groups: await getRemote<groupData[]>('groups'),
     sensors: await getRemote<sensor[]>('sensors'),
     rules: await getRemote<ruleData[]>('scheduler'),
@@ -127,7 +129,8 @@ async function initStore() {
 
   //TODO make enums with WS events
   ws.on('DEVICES_UPDATE', (data: unknown) => {
-    useStore.getState().updateDevices(data as deviceData[]);
+    console.log('Devices updated', data);
+    useStore.getState().updateDevices(data as device[]);
   });
 
   ws.on('SENSORS_UPDATE', (data: unknown) => {

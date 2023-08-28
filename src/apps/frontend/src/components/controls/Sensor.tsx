@@ -1,5 +1,5 @@
 import { sensorData, timeSeriesSubset, timeSeriesSubsetKey } from "@dash/sharedTypes";
-import { sensorChannel } from "../../../model/controlDefinitions";
+import { sensorChannel } from "../../model/controlDefinitions";
 import { useState } from "react";
 import { Row, Col, Badge, Container, ButtonGroup, Button } from "react-bootstrap";
 import { FiArrowUp, FiArrowDown } from "react-icons/fi";
@@ -42,11 +42,11 @@ function getIcon(icon: string) {
   }
 }
 
-function SensorChannel({ channelSeries, key, icon, unit, color }: sensorChannelProps) {
+function SensorChannel({ channelSeries, icon, unit, color }: sensorChannelProps) {
 
   if (channelSeries === null) {
     return (
-      <Row className="sensor_row" key={`chann_${key}`}>
+      <Row className="sensor_row">
         <LabelControl>Channel data not available</LabelControl>
       </Row>
     );
@@ -55,7 +55,7 @@ function SensorChannel({ channelSeries, key, icon, unit, color }: sensorChannelP
   const plotData = channelSeries.series.map(datapoint => ({ t: datapoint[0] * 1000, v: datapoint[1] / 1000 }));
 
   return (
-    <Row className="sensor_row" key={`chann_${key}`}>
+    <Row className="sensor_row">
       <Row>
         <Col xs="auto">
           <h2>{getIcon(icon)} {(channelSeries.extras.last !== null) ? (channelSeries.extras.last / 1000).toFixed(2) : 'NA'} <small>{unit}</small></h2>

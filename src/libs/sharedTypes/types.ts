@@ -26,8 +26,9 @@ export type deviceInfoPayload = {
   ip: string;
 }
 
-export type deviceData = deviceInfoPayload & {
+export type device = deviceInfoPayload & {
   id: string;
+  name: string;
   state: deviceStateData;
   stateString?: string;
   infoString?: string;
@@ -116,8 +117,8 @@ export type sensor = {
   last_seen: number;
 }
 
-export type expandedGroupData = groupData & {
-  devices: deviceData[];
+export type groupDataWithDevices = groupData & {
+  devices: device[];
 }
 
 export type timeSeriesSubsetKey = 'Immediate' | 'Day' | 'Week' | 'Month' | 'Year';

@@ -33,7 +33,7 @@ export type commandPayload = {
 export interface baseControl {
   type: keyof typeof controlType;
   label?: string | ((s: deviceStateData) => string);
-  style?: string | ((s: deviceStateData) => string);
+  variant?: string | ((s: deviceStateData) => string);
 }
 
 export type rangeControl = baseControl & {
@@ -43,7 +43,6 @@ export type rangeControl = baseControl & {
   payload: commandPayload | ((s: deviceStateData) => commandPayload);
 }
 export type buttonControl = baseControl & {
-  variant?: string;
   type: 'BUTTON';
   payload: commandPayload | ((s: deviceStateData) => commandPayload);
 }
@@ -66,26 +65,26 @@ export const DeviceControls: controlsList = [
   [{
     label: 'Off',
     type: 'BUTTON',
-    style: 'outline-warning',
+    variant: 'outline-warning',
     payload: { cmd: 'off', payload: '' },
   }],
   [{
     label: ({ mode }) => (mode === 2) ? 'Pause' : 'Play',
     type: 'BUTTON',
-    style: ({ mode }) => (mode === 2) ? 'outline-light' : 'outline-success',
+    variant: ({ mode }) => (mode === 2) ? 'outline-light' : 'outline-success',
     payload: ({ mode }) => (mode === 2) ? { cmd: 'pause', payload: '' } : { cmd: 'play', payload: '' },
   }],
   [
     {
       label: 'Rainbow',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 1) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 1) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '1' },
     },
     {
       label: 'Opposites',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 4) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 4) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '4' },
     },
   ],
@@ -93,13 +92,13 @@ export const DeviceControls: controlsList = [
     {
       label: 'Wavebow',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 2) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 2) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '2' },
     },
     {
       label: 'Chaser',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 6) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 6) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '6' },
     },
   ],
@@ -107,13 +106,13 @@ export const DeviceControls: controlsList = [
     {
       label: 'Hue split',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 5) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 5) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '5' },
     },
     {
       label: 'White aurora',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 7) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 7) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '7' },
     },
   ],
@@ -121,13 +120,13 @@ export const DeviceControls: controlsList = [
     {
       label: 'Aurora',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 3) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 3) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '3' },
     },
     {
       label: 'White chaser',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 8) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 8) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '8' },
     },
   ],
@@ -135,7 +134,7 @@ export const DeviceControls: controlsList = [
     {
       label: 'Trippy',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 9) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 9) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '9' },
     },
   ],
@@ -143,7 +142,7 @@ export const DeviceControls: controlsList = [
     {
       label: 'Transition Speed',
       type: 'RANGE',
-      payload: { "cmd": "spd", "payload": "$1" },
+      payload: { cmd: 'spd', payload: "" },
       min: '0',
       max: '255',
       val: ({ spd }) => spd
@@ -153,7 +152,7 @@ export const DeviceControls: controlsList = [
     {
       label: 'Brightness',
       type: 'RANGE',
-      payload: { "cmd": "br", "payload": "$1" },
+      payload: { cmd: 'br', payload: "" },
       min: '0',
       max: '250',
       val: ({ br }) => br
@@ -165,26 +164,26 @@ export const GroupControls: controlsList = [
   [{
     label: 'Off',
     type: 'BUTTON',
-    style: 'outline-warning',
+    variant: 'outline-warning',
     payload: { cmd: 'off', payload: '' },
   }],
   [{
     label: ({ mode }) => (mode === 2) ? 'Pause' : 'Play',
     type: 'BUTTON',
-    style: ({ mode }) => (mode === 2) ? 'outline-light' : 'outline-success',
+    variant: ({ mode }) => (mode === 2) ? 'outline-light' : 'outline-success',
     payload: ({ mode }) => (mode === 2) ? { cmd: 'pause', payload: '' } : { cmd: 'play', payload: '' },
   }],
   [
     {
       label: 'Rainbow',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 1) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 1) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '1' },
     },
     {
       label: 'Opposites',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 4) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 4) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '4' },
     },
   ],
@@ -192,13 +191,13 @@ export const GroupControls: controlsList = [
     {
       label: 'Wavebow',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 2) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 2) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '2' },
     },
     {
       label: 'Chaser',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 6) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 6) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '6' },
     },
   ],
@@ -206,13 +205,13 @@ export const GroupControls: controlsList = [
     {
       label: 'Hue split',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 5) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 5) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '5' },
     },
     {
       label: 'White aurora',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 7) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 7) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '7' },
     },
   ],
@@ -220,13 +219,13 @@ export const GroupControls: controlsList = [
     {
       label: 'Aurora',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 3) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 3) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '3' },
     },
     {
       label: 'White chaser',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 8) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 8) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '8' },
     },
   ],
@@ -234,7 +233,7 @@ export const GroupControls: controlsList = [
     {
       label: 'Trippy',
       type: 'BUTTON',
-      style: ({ fx }) => (fx === 9) ? 'outline-success' : 'outline-secondary',
+      variant: ({ fx }) => (fx === 9) ? 'outline-success' : 'outline-secondary',
       payload: { cmd: 'fx', payload: '9' },
     },
   ],
@@ -242,7 +241,7 @@ export const GroupControls: controlsList = [
     {
       label: 'Transition Speed',
       type: 'RANGE',
-      payload: { "cmd": "spd", "payload": "$1" },
+      payload: { cmd: 'spd', payload: "" },
       min: '0',
       max: '255',
       val: ({ spd }) => spd
@@ -250,7 +249,7 @@ export const GroupControls: controlsList = [
     {
       label: 'Brightness',
       type: 'RANGE',
-      payload: { "cmd": "br", "payload": "$1" },
+      payload: { cmd: 'br', payload: "" },
       min: '0',
       max: '250',
       val: ({ br }) => br

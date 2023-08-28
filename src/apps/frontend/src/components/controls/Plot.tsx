@@ -1,5 +1,5 @@
 import { Row } from "react-bootstrap";
-import { ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, YAxis, XAxis, LabelFormatter } from "recharts";
+import { ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, YAxis, XAxis } from "recharts";
 
 export type plotPropType = {
   data: { t: number, v: number }[];
@@ -17,7 +17,7 @@ export default function Plot(props: plotPropType) {
     return `${d.toLocaleDateString('en-GB', { month: 'numeric', 'day': '2-digit' })} : ${d.toLocaleTimeString('en-GB', { timeStyle: "short" })}`;
   }
 
-  const labelFn: LabelFormatter = (l: string | number) => {
+  const labelFn = (l: string | number) => {
     const d = new Date(l);
     return `${d.toLocaleDateString('en-GB', { month: 'numeric', 'day': '2-digit' })} : ${d.toLocaleTimeString('en-GB', { timeStyle: "short" })}`;
   }

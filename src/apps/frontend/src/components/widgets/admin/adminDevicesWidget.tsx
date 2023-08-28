@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, Row } from "react-bootstrap";
 import { AiOutlineLink, AiOutlineReload } from "react-icons/ai";
-import useStore from '../../store';
+import useStore from '../../../store';
 import AdminWidget from "./adminWidget";
 import SimpleTable from './SimpleTable';
 

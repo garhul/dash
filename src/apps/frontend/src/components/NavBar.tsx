@@ -18,7 +18,7 @@ export default function NavBar({ location, onChange }: navBarProps) {
     ([hash, name]) => (
       <Nav.Link
         key={`nav_${hash}`}
-        onClick={() => { onChange(location) }}
+        onClick={() => { onChange(hash) }}
         href={hash} active={location === hash}>{name}</Nav.Link>
     ));
 

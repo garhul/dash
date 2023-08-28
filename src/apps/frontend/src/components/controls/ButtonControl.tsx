@@ -9,5 +9,5 @@ export type buttonControlProps = {
 }
 
 export default function ButtonControl({ variant, children, onClick }: buttonControlProps) {
-  return (<Button variant={variant || "outline-info"} size="lg" onClick={() => onClick}>{children}</Button>)
+  return (<Button variant={variant || "outline-info"} size="lg" onClick={onClick}>{children}</Button>)
 }

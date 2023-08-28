@@ -1,7 +1,7 @@
 import { getTaggedLogger } from "../services/logger";
 import { Sensors, processSensorData } from "../services/store";
 import TimeSeries from "../services/store/timeSeries";
-import { sensorData } from "@dash/sharedTypes";
+import { sensor } from "@dash/sharedTypes";
 
 const logger = getTaggedLogger('PROVIDERS::Sensors');
 
@@ -20,7 +20,7 @@ export function addData(payload: string) {
   }
 };
 
-export function getAll(): sensorData[] {
+export function getAll(): sensor[] {
   return Sensors.getAll().map(s => s[1]).sort((a, b) => {
     if (a > b) return 1;
     if (b === a) return 0;

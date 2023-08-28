@@ -1,12 +1,13 @@
 import { create, StateCreator } from 'zustand'
-import { groupData, deviceData, sensorData, RuleData } from '@backend/types';
+import { groupData, deviceData, sensor, ruleData } from '@dash/sharedTypes';
 import WS from './ws';
+import { commandPayload } from '../model/controlDefinitions';
 const apiURL = `http://${window.location.host}/api/`;
 
 interface DevicesSlice {
   devices: deviceData[];
   updateDevices(devices: deviceData[]): void;
-  issueCMD(deviceIds: string[], payload: string): void;
+  issueCMD(deviceIds: string[], payload: commandPayload): void;
 };
 
 interface GroupsSlice {
@@ -15,13 +16,13 @@ interface GroupsSlice {
 };
 
 interface SensorsSlice {
-  sensors: sensorData[];
-  updateSensors(sensors: sensorData[]): void;
+  sensors: sensor[];
+  updateSensors(sensors: sensor[]): void;
 };
 
 interface RulesSlice {
-  rules: RuleData[];
-  addRule: (data: RuleData) => void //Promise<void>
+  rules: ruleData[];
+  addRule: (data: ruleData) => void //Promise<void>
   deleteRule: (id: string) => void //Promise<void>
 }
 
@@ -38,7 +39,7 @@ type StateType = DevicesSlice & GroupsSlice & SensorsSlice & RulesSlice & SysSli
 const createDevicesSlice: StateCreator<StateType, [], [], DevicesSlice> = (set) => ({
   devices: [],
   updateDevices: (devices) => set((state) => ({ devices })),
-  issueCMD: (deviceIds, payload) => updateRemote('devices', { deviceIds, payload }),
+  issueCMD: (deviceIds, payload) => updateRemote('devices', JSON.stringify({ deviceIds, payload })),
 });
 
 const createGroupsSlice: StateCreator<StateType, [], [], GroupsSlice> = (set) => ({
@@ -67,13 +68,13 @@ const createSysSlice: StateCreator<SysSlice, [], [], SysSlice> = (set) => ({
   // setScanInProgress: (flag) => set(state => state.scanInProgress)
 });
 
-const updateRemote = async (entity: 'devices' | 'groups' | 'scheduler', payload: unknown) => {
+const updateRemote = async (entity: 'devices' | 'groups' | 'scheduler', body: string) => {
   fetch(`${apiURL}${entity}`, {
     method: 'POST', // or 'PUT'
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(payload),
+    body
   })
     .then((response) => response.json())
     .then((data) => {
@@ -109,35 +110,28 @@ async function initStore() {
   useStore.setState({
     devices: await getRemote<deviceData[]>('devices'),
     groups: await getRemote<groupData[]>('groups'),
-    sensors: await getRemote<sensorData[]>('sensors'),
-    rules: await getRemote<RuleData[]>('scheduler'),
+    sensors: await getRemote<sensor[]>('sensors'),
+    rules: await getRemote<ruleData[]>('scheduler'),
     buildVersion: await getBuildVersion()
   });
 
   const ws = new WS();
 
-  ws.on('open', (data: deviceData[]) => {
-
+  ws.on('open', () => {
     useStore.getState().setWsConnected(true)
-
   });
 
-  ws.on('close', (data: deviceData[]) => {
-
+  ws.on('close', () => {
     useStore.getState().setWsConnected(false)
-
   });
 
-  ws.on('DEVICES_UPDATE', (data: deviceData[]) => {
-
-    useStore.getState().updateDevices(data)
-
+  //TODO make enums with WS events
+  ws.on('DEVICES_UPDATE', (data: unknown) => {
+    useStore.getState().updateDevices(data as deviceData[]);
   });
 
-  ws.on('SENSORS_UPDATE', (data: sensorData[]) => {
-
-    useStore.getState().updateSensors(data)
-
+  ws.on('SENSORS_UPDATE', (data: unknown) => {
+    useStore.getState().updateSensors(data as sensor[]);
   });
 
   // init ws connection after setting the subscriptions to prevent missing the 'open' message

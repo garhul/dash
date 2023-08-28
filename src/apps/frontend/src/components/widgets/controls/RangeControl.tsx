@@ -2,8 +2,8 @@ import { useState } from 'react';
 // import 'react-bootstrap-range-slider/dist/react-bootstrap-range-slider.css';
 
 export type rangeControlProps = {
-  min: string;
-  max: string;
+  min: number;
+  max: number;
   label: string;
   val: number;
   onChange: (value: number) => void;
@@ -22,8 +22,8 @@ export default function RangeControl({ min, max, label, val, onChange }: rangeCo
       <div>{label}</div>
       <input
         type="range"
-        min={parseInt(min) || 0}
-        max={parseInt(max) || 100}
+        min={min || 0}
+        max={max || 100}
         value={value}
         className="slider"
         onChange={changeHandler}

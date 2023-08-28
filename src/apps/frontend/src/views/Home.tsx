@@ -1,7 +1,7 @@
 
 import { Container } from 'react-bootstrap';
 import useStore from '../store';
-import getControlWidget from '../components/widgets';
+import ControlWidget from '../components/widgets/ControlWidget';
 import { expandedGroupData } from '@dash/sharedTypes';
 
 export default function HomeView() {
@@ -16,11 +16,9 @@ export default function HomeView() {
     }
   });
 
-  const widgets = expandedGroups.map((groupData) => getControlWidget('GROUP', groupData));
-
   return (
     <Container>
-      {widgets}
+      {expandedGroups.map((groupData) => <ControlWidget data={groupData} type='GROUP' />)}
     </Container>
   );
 }

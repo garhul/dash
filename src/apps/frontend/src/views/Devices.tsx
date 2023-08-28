@@ -1,18 +1,13 @@
-import { BuildWidget } from '../components/cards';
 import { Container } from 'react-bootstrap';
 import useStore from '../store';
-import { deviceData } from '@dash/commonTypes';
+import ControlWidget from '../components/widgets/ControlWidget';
 
 export default function DevicesView() {
-  const store = useStore((store) => store.devices);
-
-  const widgets = store.map((devices: deviceData) => BuildWidget()
-
-    < Widget controls = { DeviceCtrl } type = 'aurora' key = { d.device_id } data = { d } ></Widget >);
+  const devices = useStore((store) => store.devices);
 
   return (
     <Container>
-      {widgets}
+      {devices.map((device) => <ControlWidget type='DEVICE' data={device.state} />)}
     </Container>
   );
 }

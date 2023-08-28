@@ -8,34 +8,51 @@ export type sensorChannel = {
   unit: string;
 }
 
-export type devicePayloadType = {
-  cmd: "fx" | "spd" | "br" | "pause" | "play" | "off";
+export enum deviceCommands {
+  fx,
+  spd,
+  br,
+  pause,
+  play,
+  off
+}
+
+export enum controlType {
+  BUTTON,
+  RANGE,
+  LABEL,
+  SENSOR
+}
+
+export type commandPayload = {
+  cmd: keyof typeof deviceCommands;
   payload: string;
 };
 
-interface baseControl {
-  type: "BUTTON" | "RANGE" | "LABEL" | "SENSOR";
+
+export interface baseControl {
+  type: keyof typeof controlType;
   label?: string | ((s: deviceStateData) => string);
   style?: string | ((s: deviceStateData) => string);
 }
 
-interface rangeControl extends baseControl {
+export type rangeControl = baseControl & {
   min: string;
   max: string;
-  val: string | ((s: deviceStateData) => string);
-  payload: devicePayloadType | ((s: deviceStateData) => devicePayloadType);
+  val: number | ((s: deviceStateData) => number);
+  payload: commandPayload | ((s: deviceStateData) => commandPayload);
 }
-
-interface buttonControl extends baseControl {
+export type buttonControl = baseControl & {
+  variant?: string;
   type: 'BUTTON';
-  payload: devicePayloadType | ((s: deviceStateData) => devicePayloadType);
+  payload: commandPayload | ((s: deviceStateData) => commandPayload);
 }
 
-interface labelControl extends baseControl {
+export type labelControl = baseControl & {
   type: 'LABEL';
 };
 
-interface sensorControl extends baseControl {
+export type sensorControl = baseControl & {
   type: 'SENSOR';
   channels: sensorChannel[];
   data: (d: unknown & { data: sensorData }) => sensorData;
@@ -129,7 +146,7 @@ export const DeviceControls: controlsList = [
       payload: { "cmd": "spd", "payload": "$1" },
       min: '0',
       max: '255',
-      val: ({ spd }) => `${spd}`
+      val: ({ spd }) => spd
     },
   ],
   [
@@ -139,7 +156,7 @@ export const DeviceControls: controlsList = [
       payload: { "cmd": "br", "payload": "$1" },
       min: '0',
       max: '250',
-      val: ({ br }) => `${br}`
+      val: ({ br }) => br
     },
   ],
 ];
@@ -228,7 +245,7 @@ export const GroupControls: controlsList = [
       payload: { "cmd": "spd", "payload": "$1" },
       min: '0',
       max: '255',
-      val: ({ spd }) => `${spd}`
+      val: ({ spd }) => spd
     },
     {
       label: 'Brightness',
@@ -236,7 +253,7 @@ export const GroupControls: controlsList = [
       payload: { "cmd": "br", "payload": "$1" },
       min: '0',
       max: '250',
-      val: ({ br }) => `${br}`
+      val: ({ br }) => br
     },
   ],
 ];

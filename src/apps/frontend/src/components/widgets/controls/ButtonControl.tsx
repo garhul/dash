@@ -1,12 +1,13 @@
 import { ReactNode } from "react";
 import { Button } from "react-bootstrap";
+import { ButtonVariant } from "react-bootstrap/esm/types";
 
 export type buttonControlProps = {
-  style: string;
+  variant: ButtonVariant;
   children: string | ReactNode;
   onClick: () => void;
 }
 
-export default function ButtonControl({ style, children, onClick }: buttonControlProps) {
-  return (<Button variant={style || "outline-info"} size="lg" onClick={() => onClick}>{children}</Button>)
+export default function ButtonControl({ variant, children, onClick }: buttonControlProps) {
+  return (<Button variant={variant || "outline-info"} size="lg" onClick={() => onClick}>{children}</Button>)
 }

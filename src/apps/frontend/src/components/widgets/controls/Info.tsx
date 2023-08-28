@@ -1,4 +1,4 @@
-import { expandedGroupData, sensorData } from "@dash/sharedTypes";
+import { expandedGroupData, sensor } from "@dash/sharedTypes";
 
 export type widgetInfoProps = Record<string, string>;
 export function WidgetInfo(props: widgetInfoProps) {
@@ -39,7 +39,7 @@ export function GroupInfo(props: expandedGroupData) {
 //   )
 // }
 
-export function SensorInfo(props: sensorData) {
+export function SensorInfo(props: sensor) {
   return (
     <ul className="info">
       <li>device id: <span>{props.id}</span></li>

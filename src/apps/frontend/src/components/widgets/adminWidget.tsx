@@ -1,6 +1,13 @@
+import { ReactNode } from "react";
 import { Container } from "react-bootstrap";
 
-export default function AdminWidget(props) {
+export type adminWidgetProps = {
+  title: string;
+  actions: ReactNode;
+  children: ReactNode | string;
+}
+
+export default function AdminWidget(props: adminWidgetProps) {
   return (
     <Container className='widget'>
       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>

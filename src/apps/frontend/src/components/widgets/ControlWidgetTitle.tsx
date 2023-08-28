@@ -1,9 +1,10 @@
 import { deviceData } from "@dash/sharedTypes";
 import { Col, Badge, Row } from "react-bootstrap";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { controlWidgetTypes } from "./ControlWidget";
 
 type widgetTitleProps = {
-  type: "AURORA" | "GROUP" | "SENSOR";
+  type: keyof typeof controlWidgetTypes;
   onViewToggle: () => void;
   name: string;
   ip?: string;

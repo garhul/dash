@@ -1,94 +1,111 @@
-import { deviceData } from "@dash/sharedTypes";
 import { useState } from "react";
-import { Badge, Col, Container, Row } from "react-bootstrap";
-import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Col, Container, Row, Alert } from "react-bootstrap";
+import { deviceStateData, expandedGroupData, groupData, sensorData } from "@dash/sharedTypes";
+
+import { rangeControl, controlsList, control, buttonControl, commandPayload, sensorControl, labelControl, baseControl, DeviceControls, GroupControls, SensorControls } from '../../model/controlDefinitions';
+import RangeControl from './controls/RangeControl';
+import ButtonControl from './controls/ButtonControl';
+import LabelControl from "./controls/LabelControl";
+import Sensor from './controls/Sensor';
+
 import useStore from "../../store";
-import { DeviceControlType } from "./controlDefinitions";
 import ControlWidgetTitle from "./ControlWidgetTitle";
-import { Container, Row, Col, Alert } from 'react-bootstrap';
-import { deviceStateData, sensorData } from '@dash/sharedTypes';
-import ButtonControl from './ButtonControl';
-import RangeControl from './RangeControl';
-import CMDLabel from './Label';
-import Sensor from './Sensor';
-import { DeviceControlsList, DeviceControlType, GroupControlList, SensorCtrlTypeList, SensorCtrlType } from './controlDefinitions';
 
 
-function parseControlList(state: deviceStateData | sensorData, control: DeviceControlType | SensorCtrlType): unknown {
-  const parsed: DeviceControlType | SensorCtrlType;
+type parsedValue = string | number | commandPayload | sensorData;
+type controlGroupState = deviceStateData | sensorData | expandedGroupData;
+type fn = (d: controlGroupState) => parsedValue;
 
-  Object.keys(control).forEach(key => {
-    if (typeof control[key] === 'function')
-      parsed[key] = control[key].call(null, state);
+function parseControls<T extends baseControl>(state: controlGroupState, controlDefinition: T): Record<keyof T, parsedValue> {
+  const parsedFields: Record<string, parsedValue> = {};
+  const keys = Object.keys(controlDefinition);
+
+  keys.forEach(key => {
+    if (typeof controlDefinition[key as keyof T] === 'function') {
+      const fn = controlDefinition[key as keyof T] as fn;
+
+      parsedFields[key] = fn.call(null, state);
+    }
   });
 
-  return { ...control, ...parsed };
+  return { ...controlDefinition, ...parsedFields };
 }
 
-type deviceControlPropsType = {
-  controlsList: T;
-  state?: deviceStateData | sensorData;
-  onChange?: (payload: string, data: null | string) => void;
+type controlsPropsType = {
+  controls: controlsList;
+  state: deviceStateData | sensorData | expandedGroupData;
+  onChange: (payload: string) => void;
 }
 
-export default function Controls({ controlsList, state, onChange }: deviceControlPropsType) {
-  const Controls = controlsList.map((row, i: number) => {
-
+function Controls({ controls, state, onChange }: controlsPropsType) {
+  const ctrlList = controls.map((row, i: number) => {
     return (
-      <Row key={`row_${i}`}>
-        {row.map((rawCtrl: DeviceControlType, index: number) => {
-
-          if (!rawCtrl.type) return null;
-          const ctrl = (state) ? parseControls(state, rawCtrl) : rawCtrl;
-
-          switch (ctrl.type) {
-            case 'BUTTON':
+      <Row key={`row_${i}`}>{
+        row.map((controlDef: control, index: number) => {
+          const type = controlDef.type;
+          switch (type) {
+            case 'BUTTON': {
+              const parsedControl = parseControls<buttonControl>(state, controlDef as buttonControl);
               return (
                 <Col key={`btn_${index}`}>
-                  <CMDButton
-                    update={(data) => props.update(ctrl.payload, data)}
-                    key={`btn_${index}`}
-                    {...ctrl}>
-                  </CMDButton>
+                  <ButtonControl
+                    variant={parsedControl.variant as string || ''}
+                    onClick={() => onChange(JSON.stringify(parsedControl.payload))}>
+                    {parsedControl.label as string}
+                  </ButtonControl>
                 </Col>);
+            }
 
-            case 'LABEL':
+            case 'LABEL': {
+              const parsedControl = parseControls<labelControl>(state, controlDef as labelControl);
               return (
                 <Col key={`label_${index}`}>
-                  <CMDLabel {...ctrl}></CMDLabel>
+                  <LabelControl>{parsedControl.label as string}</LabelControl>
                 </Col>
               )
+            }
 
-            case 'RANGE':
+            case 'RANGE': {
+              const parsedControl = parseControls<rangeControl>(state, controlDef as rangeControl);
               return (
                 <Col key={`range_${index}`}>
-                  <CMDRange update={(data) => props.update(ctrl.payload, data)} key={`rng_${index}`} {...ctrl}></CMDRange>
+                  <RangeControl
+                    onChange={(data) => onChange(JSON.stringify(parsedControl.payload))}
+                    val={parsedControl.val as number}
+                    max={parsedControl.max as number}
+                    min={parsedControl.min as number}
+                    label={parsedControl.label as string || ''} />
                 </Col>
               )
+            }
 
-            case 'SENSOR':
+            case 'SENSOR': {
+              const parsedControl = parseControls<sensorControl>(state, controlDef as sensorControl);
               return (
                 <Col key={`sensor_${index}`}>
-                  <Sensor {...ctrl}></Sensor>
+                  <Sensor
+                    channels={(controlDef as sensorControl).channels}
+                    data={parsedControl.data as sensorData}
+                    lastSeen={parsedControl.lastSeen as number}
+                  />
                 </Col>
               )
+            }
 
             default:
-              return (<Alert key={`alert_${index}`} variant="warning">Control for {ctrl.type} not found!</Alert>);
+              return (<Alert key={`alert_${index}`} variant="warning">Control {type} not found!</Alert>);
           }
         })}
-      </Row>
+      </Row >
     )
   });
 
   return (
     <Container>
-      {Controls}
+      {ctrlList}
     </Container>
   );
 }
-
-
 
 export enum controlWidgetTypes {
   SENSOR,
@@ -96,44 +113,43 @@ export enum controlWidgetTypes {
   GROUP
 };
 
-
-
 export type controlWidgetBodyProps = {
   type: controlWidgetTypes;
 }
 
-function ControlWidgetBody<T extends baseControls>({ type, data, controlList, onChange }: commandIssuingWidgetProps) {
-  switch (type) {
-    case controlWidgetTypes.DEVICE:
-      // if (viewInfo) return <WidgetInfo {...props.data as deviceData} />;
-      return <DeviceControls state={(props.data as deviceData).state} controls={controlList} onChange />;
+// function ControlWidgetBody<T extends baseControls>({type, data, controlList, onChange}: commandIssuingWidgetProps) {
+//   switch (type) {
+//     case controlWidgetTypes.DEVICE:
+//       // if (viewInfo) return <WidgetInfo {...props.data as deviceData} />;
+//       return <DeviceControls state={(props.data as deviceData).state} controls={controlList} onChange />;
 
-    case controlWidgetTypes.GROUP:
-      // if (viewInfo) return <GroupInfo {...props.data as expandedGroupData} />;
-      return <DeviceControls state={(props.data as expandedGroupData).devices[0]?.state} controls={controlList} onChange />;
+//     case controlWidgetTypes.GROUP:
+//       // if (viewInfo) return <GroupInfo {...props.data as expandedGroupData} />;
+//       return <DeviceControls state={(props.data as expandedGroupData).devices[0]?.state} controls={controlList} onChange />;
 
-    case controlWidgetTypes.SENSOR:
-      // if (viewInfo) return <SensorInfo {...props.data as sensorData} />;
-      return <DeviceControls state={(props.data as sensorData)} controls={controlList} />;
-  }
+//     case controlWidgetTypes.SENSOR:
+//       // if (viewInfo) return <SensorInfo {...props.data as sensorData} />;
+//       return <DeviceControls state={(props.data as sensorData)} controls={controlList} />;
+//   }
 
-  return <DeviceControls st
-}
+//   return <DeviceControls st
+// }
 
 
 
 
 export type widgetProps<T> = {
-  title: TitleType extends WidgetTitle;
-  // data: T;
+  // title: TitleType extends WidgetTitle;
+  type: keyof typeof controlWidgetTypes;
+  data: sensorData | deviceStateData | expandedGroupData;
 }
 
-export default function ControlWidget<T extends DeviceControlType>(props: widgetProps<T>) {
+export default function ControlWidget<T>({ data, type }: widgetProps<T>) {
   const [infoVisible, setInfoVisible] = useState<boolean>(false);
   const issueCMD = useStore((state) => state.issueCMD);
 
-  const onChange = (payload: string, value: string) => {
-    console.log(`Issuing command ${payload} with value ${value}`);
+  const changeHandler = (payload: string) => {
+    console.log(`Issuing command ${payload}`);
     // issueCMD(payload);
 
     // if (props.type === 'aurora') {
@@ -142,44 +158,16 @@ export default function ControlWidget<T extends DeviceControlType>(props: widget
     //   issueCMD((props.data as expandedGroupData).deviceIds, JSON.stringify(payload).replace('$1', value));
     // }
   }
+  const controls = (type === 'DEVICE') ? DeviceControls : (type === 'GROUP') ? GroupControls : SensorControls;
+  //<GroupInfo {...props.data as expandedGroupData} />
+  const body = (infoVisible) ? null /*info*/ : <Controls state={data} onChange={changeHandler} controls={controls} />; //info;
+
+  return (
+    <Container className={`widget widget_${type}`} >
+      <ControlWidgetTitle name="{data.name}" type={type} onViewToggle={() => setInfoVisible(!infoVisible)}
+      />
+      {body}
+    </ Container>
+  );
+
 }
-
-const controls = <DeviceControls state={data as T} onChange={changeHandler} />;
-
-return (
-  <Container className={`widget widget_${type}`} >
-    <ControlWidgetTitle name="{data.name}" type={type} onViewToggle={() => setInfoVisible(!infoVisible)}
-    />
-    {viewInfo ? controls : info}
-  </ Container>
-);
-
-}
-
-
-
-// let body = null;
-// switch (type) {
-//   case "SENSOR":
-//     body = (<Widget controls={SensorControls} type='aurora' data={data as sensorData} ></Widget >);
-//     break;
-
-//   case "DEVICE": //at the time of writting this all devices are "auroras"
-//     body = (<Widget controls={DeviceControls} type='aurora' data={data as deviceData} ></Widget >);
-//     break;
-
-//   case "GROUP":
-//     return (<Widget controls={GroupControls} type='aurora' data={data} />);
-//     break;
-
-//   default: return null;
-
-// }
-
-// return (
-//   <Container>
-//     <WidgetTitle />
-//     {body}
-
-//   </Container>
-// )

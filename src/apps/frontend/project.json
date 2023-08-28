@@ -13,10 +13,10 @@
         "outputPath": "dist/apps/frontend",
         "index": "apps/frontend/src/index.html",
         "baseHref": "/",
-        "main": "apps/frontend/src/main.tsx",
+        "main": "apps/frontend/src/index.tsx",
         "tsConfig": "apps/frontend/tsconfig.app.json",
         "assets": ["apps/frontend/src/assets/favicon.png", "apps/frontend/src/assets"],
-        "styles": ["apps/frontend/src/styles.css"],
+        "styles": ["apps/frontend/src/app.css"],
         "scripts": [],
         "isolatedConfig": true,
         "webpackConfig": "apps/frontend/webpack.config.js"

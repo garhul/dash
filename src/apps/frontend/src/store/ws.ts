@@ -1,10 +1,11 @@
 
 import { v4 as uuidv4 } from 'uuid';
-export type evHandler = (data: any) => void;
+
+export type wsEventHandler = (data: unknown) => void;
 
 export default class WS {
-  socket: WebSocket;
-  subscriptions: Map<string, any>;
+  socket: WebSocket | undefined;
+  subscriptions: Map<string, wsEventHandler[]>;
 
   constructor() {
     this.subscriptions = new Map();
@@ -34,10 +35,16 @@ export default class WS {
   }
 
   async emit(ev: string, msg: string, expectResponse = false) {
+
     return new Promise((resolve, reject) => {
       console.info(`Emitting message: ${JSON.stringify({ ev, msg })}`);
 
-      if (this.socket.readyState !== 1) {
+      if (this.socket === undefined) {
+        console.warn(`ws not initialized`);
+        return reject('WS not initialized');
+      }
+
+      if (this.socket.readyState !== WebSocket.OPEN) {
         console.log('not ready yet', ev, msg);
         reject(new Error('Not ready to send'));
       }
@@ -56,28 +63,30 @@ export default class WS {
     });
   }
 
-  handleEvent(ev: string, data?: any) {
-    const hndlrs = this.subscriptions.has(ev) ? this.subscriptions.get(ev) : [];
-    hndlrs.forEach(fn => fn.call(this, data));
+  handleEvent(ev: string, data?: unknown) {
+    const hndlrs = this.subscriptions.get(ev);
+    if (hndlrs === undefined) return;
+
+    hndlrs.forEach((fn: wsEventHandler) => fn.call(this, data));
     if (hndlrs.length === 0) {
       console.warn(`No handlers registered for ev ${ev}`);
     }
   }
 
-  on(ev: string, fn: evHandler) {
-    const subs = this.subscriptions.has(ev) ? [...this.subscriptions.get(ev), fn] : [fn];
-    this.subscriptions.set(ev, subs);
+  on(ev: string, fn: wsEventHandler) {
+    const handlers = this.subscriptions.get(ev) || [];
+    this.subscriptions.set(ev, [...handlers, fn]);
   }
 
-  off(ev: string, fn: evHandler) {
-    const subs = this.subscriptions.get(ev);
+  off(ev: string, fn: wsEventHandler) {
+    const subs: wsEventHandler[] | undefined = this.subscriptions.get(ev);
 
     if (subs === undefined) {
       console.warn(`ev:${ev} has no handler registered`);
       return;
     }
 
-    const idx = subs.findIndex((f) => (f === fn));
+    const idx = subs.findIndex((f: wsEventHandler) => (f === fn));
     subs.splice(idx, 1);
 
     if (subs.length === 0) {
@@ -88,6 +97,6 @@ export default class WS {
   }
 
   isConnected() {
-    return this.socket.readyState === 1;
+    return this.socket?.readyState === WebSocket.OPEN;
   }
 }

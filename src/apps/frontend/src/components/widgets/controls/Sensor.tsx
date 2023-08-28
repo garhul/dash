@@ -1,4 +1,5 @@
-import { timeSeriesSubset, timeSeriesSubsetKey } from "@dash/sharedTypes";
+import { sensorData, timeSeriesSubset, timeSeriesSubsetKey } from "@dash/sharedTypes";
+import { sensorChannel } from "../../../model/controlDefinitions";
 import { useState } from "react";
 import { Row, Col, Badge, Container, ButtonGroup, Button } from "react-bootstrap";
 import { FiArrowUp, FiArrowDown } from "react-icons/fi";
@@ -8,19 +9,13 @@ import LabelControl from "./LabelControl";
 import Plot from "./Plot";
 
 export type sensorProps = {
-  channels: [
-    { icon: string, key: string, color: string, unit: string }
-  ];
-  data: { key: string, series: timeSeriesSubset[] }[];
+  channels: sensorChannel[];
+  data: sensorData;
   lastSeen: number;
 }
 
-export type sensorChannelProps = {
+export type sensorChannelProps = sensorChannel & {
   channelSeries: timeSeriesSubset | null;
-  channelKey: string;
-  icon: string;
-  unit: string;
-  color: string;
 }
 
 type plotButtonRowProps = {
@@ -47,11 +42,11 @@ function getIcon(icon: string) {
   }
 }
 
-function SensorChannel({ channelSeries, channelKey, icon, unit, color }: sensorChannelProps) {
+function SensorChannel({ channelSeries, key, icon, unit, color }: sensorChannelProps) {
 
   if (channelSeries === null) {
     return (
-      <Row className="sensor_row" key={`chann_${channelKey}`}>
+      <Row className="sensor_row" key={`chann_${key}`}>
         <LabelControl>Channel data not available</LabelControl>
       </Row>
     );
@@ -60,7 +55,7 @@ function SensorChannel({ channelSeries, channelKey, icon, unit, color }: sensorC
   const plotData = channelSeries.series.map(datapoint => ({ t: datapoint[0] * 1000, v: datapoint[1] / 1000 }));
 
   return (
-    <Row className="sensor_row" key={`chann_${channelKey}`}>
+    <Row className="sensor_row" key={`chann_${key}`}>
       <Row>
         <Col xs="auto">
           <h2>{getIcon(icon)} {(channelSeries.extras.last !== null) ? (channelSeries.extras.last / 1000).toFixed(2) : 'NA'} <small>{unit}</small></h2>
@@ -111,10 +106,10 @@ export default function Sensor({ lastSeen, channels, data }: sensorProps) {
   const [domain, setDomain] = useState<timeSeriesSubsetKey>('Immediate');
 
   const plotChannels = channels.map(channel => (
-    <SensorChannel key={`sensor_${channel.key}`}
+    <SensorChannel
       channelSeries={data.find(subset => subset.key === channel.key)?.series.find(s => s.key === domain) || null}
       icon={channel.icon}
-      channelKey={channel.key}
+      key={channel.key}
       unit={channel.unit}
       color={channel.color}
     />));

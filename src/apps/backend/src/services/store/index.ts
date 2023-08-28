@@ -1,4 +1,4 @@
-import { deviceData, groupData, ruleData, sensorData } from '@dash/sharedTypes';
+import { deviceData, groupData, ruleData, sensor } from '@dash/sharedTypes';
 import { getTaggedLogger } from '../logger';
 import { getConfig } from '../../config';
 import fs from 'fs';
@@ -35,7 +35,7 @@ Groups.onChange((d) => persistToFile<groupData>(d, getConfig('store.groups') as 
 export const SchedulerRules = new ObservableCollection<ruleData>('SchedulerRules', loadFromFile<ruleData>(getConfig('store.scheduler') as string));
 SchedulerRules.onChange((d) => persistToFile<ruleData>(d, getConfig('store.scheduler') as string));
 
-export const Sensors = new ObservableCollection<sensorData>('Sensors', null);
+export const Sensors = new ObservableCollection<sensor>('Sensors', null);
 //TODO :: Implement persistence for sensor data
 
 

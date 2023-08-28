@@ -107,10 +107,12 @@ type aggregatedData = {
   last: number | null;
 }
 
-export type sensorData = {
+export type sensorData = { key: string, series: timeSeriesSubset[] }[];
+
+export type sensor = {
   id: string;
   name: string;
-  data: { key: string, series: timeSeriesSubset[] }[];
+  data: sensorData;
   last_seen: number;
 }
 

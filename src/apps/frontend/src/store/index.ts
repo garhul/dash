@@ -1,7 +1,8 @@
 import { create, StateCreator } from 'zustand'
 import { groupData, device, sensor, ruleData } from '@dash/sharedTypes';
 import WS from './ws';
-import { commandPayload } from '../model/controlDefinitions';
+
+//TODO:: this will change, and it's here only for current development
 const apiURL = `http://${window.location.hostname}:1984/api/`;
 console.log({ apiURL });
 
@@ -78,7 +79,12 @@ const updateRemote = async (entity: 'devices' | 'groups' | 'scheduler', body: st
     },
     body
   })
-    .then((response) => response.json())
+    .then((response) => {
+      // TODO: check response status and parse body only when a body is expected
+      if (response.status === 200) {
+        response.json();
+      }
+    })
     .then((data) => {
       console.log('Success:', data);
     })
@@ -111,7 +117,7 @@ const useStore = create<StateType>()((...a) => ({
 async function initStore() {
   useStore.setState({
     devices: (await getRemote<[string, device][]>('devices')).map(d => d[1]),
-    groups: await getRemote<groupData[]>('groups'),
+    groups: (await getRemote<[string, groupData][]>('groups')).map(d => d[1]),
     sensors: await getRemote<sensor[]>('sensors'),
     rules: await getRemote<ruleData[]>('scheduler'),
     buildVersion: await getBuildVersion()

@@ -13,7 +13,7 @@ export function add(req: Request, res: Response) {
 export function issueCommand(req: Request<unknown, unknown, { ids: string[], payload: string }>, res: Response) {
   try {
     DevicesProvider.issueCommand(req.body.ids, req.body.payload);
-    res.status(HttpStatusCodes.ACCEPTED).send();
+    res.status(HttpStatusCodes.ACCEPTED).json({});
   } catch (ex) {
     logger.error(`Error issuig command ${ex}`);
   }
@@ -22,7 +22,7 @@ export function issueCommand(req: Request<unknown, unknown, { ids: string[], pay
 export function scan(req: Request, res: Response) {
   if (!DevicesProvider.isScanning()) {
     DevicesProvider.scan();
-    res.status(HttpStatusCodes.ACCEPTED).send();
+    res.status(HttpStatusCodes.ACCEPTED).json({});
   } else {
     res.status(HttpStatusCodes.SERVICE_UNAVAILABLE);
     res.set({ 'Retry-After': 120 }).send();
@@ -31,7 +31,7 @@ export function scan(req: Request, res: Response) {
 
 export function del(req: Request<{ id: string }>, res: Response) {
   if (DevicesProvider.del(req.params.id)) {
-    res.status(HttpStatusCodes.NO_CONTENT).send();
+    res.status(HttpStatusCodes.NO_CONTENT).json({});
   } else {
     logger.warn(`Attempted to remove non registered device ${req.params.id}`);
     res.status(HttpStatusCodes.NOT_FOUND).send();

@@ -8,22 +8,22 @@ export enum controlWidgetTypes {
 
 export type p = device | groupDataWithDevices | sensor;
 
-export type controlWidgetProps<T typeof p>) > = {
+export interface controlWidgetProps {
   type: keyof typeof controlWidgetTypes;
-  data: T;
+  data: groupDataWithDevices | device | sensor;
 };
 
-// export type groupControlWidget = controlWidgetBase & {
-//   type: 'GROUP';
-//   data: groupDataWithDevices;
-// };
+export interface groupControlWidget extends controlWidgetProps {
+  type: 'GROUP';
+  data: groupDataWithDevices;
+};
 
-// export type deviceControlWidget = controlWidgetBase & {
-//   type: 'DEVICE';
-//   data: device;
-// };
+export interface deviceControlWidget extends controlWidgetProps {
+  type: 'DEVICE';
+  data: device;
+};
 
-// export type sensorControlWidget = controlWidgetBase & {
-//   type: 'SENSOR';
-//   data: sensor;
-// };
+export interface sensorControlWidget extends controlWidgetProps {
+  type: 'SENSOR';
+  data: sensor;
+};

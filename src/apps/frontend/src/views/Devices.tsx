@@ -8,7 +8,13 @@ export default function DevicesView() {
   console.log(devices);
   return (
     <Container>
-      {devices.map((device, i) => <ControlWidget<deviceControlWidget> key={`dev_${i}`} type='DEVICE' data={device} />)}
+      {devices.map((device, i) =>
+        <ControlWidget<deviceControlWidget>
+          key={`dev_${i}`}
+          type='DEVICE'
+          data={device}
+        />
+      )}
     </Container>
   );
 }

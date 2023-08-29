@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Col, Container, Row, Alert } from "react-bootstrap";
-import { device, groupDataWithDevices, sensor, sensorData } from "@dash/sharedTypes";
+import { device, deviceStateData, groupDataWithDevices, sensor, sensorData } from "@dash/sharedTypes";
 
 import { rangeControl, controlsList, control, buttonControl, commandPayload, sensorControl, labelControl, baseControl, DeviceControls, GroupControls, SensorControls } from '../../../model/controlDefinitions';
 import RangeControl from '../../controls/RangeControl';
@@ -11,9 +11,10 @@ import useStore from "../../../store";
 import ControlWidgetTitle from "./ControlWidgetTitle";
 import { controlWidgetProps } from "./types";
 import { ControlWidgetInfo } from "./ControlWidgetInfo";
+import Widget from "../Widget";
 
 type parsedValue = string | number | commandPayload | sensorData;
-type controlGroupData = device | sensor | groupDataWithDevices;
+type controlGroupData = deviceStateData | sensor | groupDataWithDevices;
 type fn = (d: controlGroupData) => parsedValue;
 
 function parseControls<T extends baseControl>(state: controlGroupData, controlDefinition: T): Record<keyof T, parsedValue> {
@@ -33,7 +34,7 @@ function parseControls<T extends baseControl>(state: controlGroupData, controlDe
 
 type controlsPropsType = {
   controls: controlsList;
-  state: device | sensor | groupDataWithDevices;
+  state: deviceStateData | sensor | groupDataWithDevices;
   onChange: (payload: string) => void;
 }
 
@@ -70,7 +71,7 @@ function Controls({ controls, state, onChange }: controlsPropsType) {
               return (
                 <Col key={`range_${index}`}>
                   <RangeControl
-                    onChange={(val) => onChange(JSON.stringify({ ...controlDef.payload, ...{ payload: val } }))}
+                    onChange={(val) => onChange(JSON.stringify({ ...controlDef.payload, ...{ payload: `${val}` } } as commandPayload))}
                     val={parsedControl.val as number}
                     max={parsedControl.max as number}
                     min={parsedControl.min as number}
@@ -107,33 +108,26 @@ function Controls({ controls, state, onChange }: controlsPropsType) {
   );
 }
 
-export default function ControlWidget<T extends controlWidgetProps,>({ data, type }: T) {
-  const [infoVisible, setInfoVisible] = useState<boolean>(false);
-  const issueCMD = useStore((state) => state.issueCMD);
+export default function ControlWidget<T extends controlWidgetProps>({ data, type }: T) {
+  const [showInfo, setShowInfo] = useState<boolean>(false);
 
-  const changeHandler = (payload: string) => {
+  const changeHandler = useCallback((payload: string) => {
     const ids: string[] = (type === 'DEVICE')
       ? [data.id]
       : (type === 'GROUP') ? (data as groupDataWithDevices).devices.map(d => d.id) : [];
 
     console.log(`Issuing command ${payload} to device ids ${ids}`);
-    issueCMD(ids, payload);
-  }
+    useStore.getState().issueCMD(ids, payload);
+  }, [type, data]);
+
 
   const controls = (type === 'DEVICE') ? DeviceControls : (type === 'GROUP') ? GroupControls : SensorControls;
-  //<GroupInfo {...props.data as expandedGroupData} />
-  const info = <ControlWidgetInfo<T> data={data} type={type} />;
-  const body = (infoVisible) ? info : <Controls state={data} onChange={changeHandler} controls={controls} />;
-
+  const state = (type === 'DEVICE') ? (data as device).state : (type === 'GROUP') ? data as groupDataWithDevices : data as sensor;
   return (
-    <Container className={`widget widget_${type}`} >
-      <ControlWidgetTitle
-        name={data.name}
-        type={type}
-        onViewToggle={() => setInfoVisible(!infoVisible)}
-      />
-      {body}
-    </ Container>
-  );
-
+    <Widget
+      title={<ControlWidgetTitle name={data.name} type={type} onViewToggle={() => setShowInfo(!showInfo)} />}
+      visibleFace={showInfo ? 'back' : 'front'}
+      front={<Controls state={state} onChange={changeHandler} controls={controls} />}
+      back={<ControlWidgetInfo<T> data={data} type={type} />}
+    />)
 }

@@ -1,8 +1,8 @@
 import { device, groupDataWithDevices, sensor } from "@dash/sharedTypes";
-import { controlWidgetBase } from "./types";
+import { controlWidgetProps } from "./types";
 
 export type widgetInfoProps = Record<string, string>;
-export function ControlWidgetInfo<T extends controlWidgetBase>({ data, type }: T) {
+export function ControlWidgetInfo<T extends controlWidgetProps>({ data, type }: T) {
 
   const items: { label: string, value: string }[] = [];
   items.push(
@@ -37,7 +37,7 @@ export function ControlWidgetInfo<T extends controlWidgetBase>({ data, type }: T
 
   return (
     <ul className="info">
-      {items.map(i => (<li >{i.label}<span>{i.value}</span></li>))}
+      {items.map((i, k) => (<li key={`info_item_${k}`}>{i.label}<span>{i.value}</span></li>))}
     </ul>
   );
 }

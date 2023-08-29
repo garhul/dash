@@ -14,13 +14,13 @@ export default function HomeView() {
       id: group.id,
       name: group.name,
       deviceIds: group.deviceIds,
-      devices: (store.devices.filter(d => group.deviceIds.includes(d.device_id)))
+      devices: (store.devices.filter(d => group.deviceIds.includes(d.id)))
     }
   });
 
   return (
     <Container>
-      {expandedGroups.map((groupData) => <ControlWidget<groupControlWidget> data={groupData} type='GROUP' />)}
+      {expandedGroups.map((groupData, i) => <ControlWidget<groupControlWidget> key={`group_${i}`} data={groupData} type='GROUP' />)}
     </Container>
   );
 }
